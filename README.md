@@ -81,16 +81,6 @@ media/            fotografías de habitaciones
 
 Flujo de Django aplicado: **Usuario → URL → Vista → Formulario → Modelo → Base de datos → Template → Navegador**.
 
-## Subirlo a GitHub (opcional)
-
-```bash
-git init
-git add .
-git commit -m "Hotel Paradise: sistema de reservaciones"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/hotel-paradise.git
-git push -u origin main
-```
 
 ## Tecnologías
 
