@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}Habitaciones{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Habitaciones</h1>
+    <p>{{ paginator.count }} habitaci{{ paginator.count|pluralize:"ón,ones" }} con los filtros actuales.</p>
+  </div>
+  {% if es_admin %}<a class="btn btn-primary" href="{% url 'habitaciones:crear' %}"><i class="bi bi-plus-lg me-1"></i>Registrar habitación</a>{% endif %}
+</div>
+
+<div class="chips mb-3" aria-label="Filtrar por tipo">
+  <a class="chip {% if not request.GET.tipo %}activo{% endif %}" href="?{% qs tipo='' page='' %}">Todas</a>
+  {% for t in resumen_tipos %}
+  <a class="chip {% if request.GET.tipo == t.tipo %}activo{% endif %}" href="?{% qs tipo=t.tipo page='' %}">{{ t.etiqueta }}<span class="n">{{ t.n }}</span></a>
+  {% endfor %}
+</div>
+
+<div class="panel mb-4">
+  <form class="filtros" method="get" data-autoenvio>
+    <div class="buscar"><i class="bi bi-search"></i>
+      <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Número o descripción" aria-label="Buscar habitación">
+    </div>
+    <input type="hidden" name="tipo" value="{{ request.GET.tipo }}">
+    <select class="form-select" name="estado" aria-label="Estado">
+      {% for v, l in filtro.fields.estado.choices %}<option value="{{ v }}" {% if request.GET.estado == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-light" type="submit">Buscar</button>
+    {% if request.GET %}<a class="btn btn-link" href="{% url 'habitaciones:lista' %}">Limpiar</a>{% endif %}
+  </form>
+</div>
+
+{% if habitaciones %}
+<div class="hab-grid">
+  {% for h in habitaciones %}
+  <a class="hab-card" href="{{ h.get_absolute_url }}">
+    <div class="hab-foto" {% if h.imagen %}style="background-image:url('{{ h.imagen.url }}')"{% endif %}>
+      {% if not h.imagen %}<span class="sin-foto"><i class="bi bi-image"></i></span>{% endif %}
+      {% if not h.disponible %}<span class="estado estado-fuera">Fuera de servicio</span>
+      {% elif h.pk in ocupadas %}<span class="estado estado-ocupada">Ocupada hoy</span>
+      {% else %}<span class="estado estado-libre">Libre hoy</span>{% endif %}
+    </div>
+    <div class="hab-info">
+      <div>
+        <div class="hab-num">{{ h.numero }}</div>
+        <div class="hab-tipo">{{ h.get_tipo_display }}, hasta {{ h.capacidad }} pers.</div>
+      </div>
+      <div class="hab-precio">{{ h.precio_noche|moneda }}<small>por noche</small></div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+<div class="panel mt-3">{% include "includes/paginacion.html" %}</div>
+{% else %}
+<div class="panel vacio"><i class="bi bi-door-closed"></i>
+  <p class="mb-2">Ninguna habitación coincide con la búsqueda.</p>
+  <a href="{% url 'habitaciones:lista' %}">Ver todas las habitaciones</a>
+</div>
+{% endif %}
+{% endblock %}

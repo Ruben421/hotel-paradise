@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}Clientes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Clientes</h1>
+    <p>{% if q %}{{ paginator.count }} resultado{{ paginator.count|pluralize }} para “{{ q }}”{% else %}{{ total_clientes }} clientes registrados{% endif %}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'clientes:crear' %}"><i class="bi bi-person-plus me-1"></i>Registrar cliente</a>
+</div>
+
+<div class="panel">
+  <form class="filtros" method="get" data-autoenvio>
+    <div class="buscar"><i class="bi bi-search"></i>
+      <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Nombre, apellidos, correo o teléfono" aria-label="Buscar cliente" autofocus>
+    </div>
+    <select class="form-select" name="orden" aria-label="Ordenar">
+      <option value="nombre" {% if orden == "nombre" %}selected{% endif %}>Ordenar por apellido</option>
+      <option value="recientes" {% if orden == "recientes" %}selected{% endif %}>Registrados recientemente</option>
+      <option value="reservas" {% if orden == "reservas" %}selected{% endif %}>Más reservaciones</option>
+    </select>
+    <button class="btn btn-light" type="submit">Buscar</button>
+    {% if q %}<a class="btn btn-link" href="{% url 'clientes:lista' %}">Limpiar</a>{% endif %}
+  </form>
+
+  {% if clientes %}
+  <div class="table-responsive">
+    <table class="table tabla">
+      <thead><tr><th>Cliente</th><th>Teléfono</th><th class="text-center">Reservaciones</th><th>Última estancia</th><th class="text-end">Consumo</th><th>Registro</th></tr></thead>
+      <tbody>
+      {% for c in clientes %}
+      <tr data-href="{{ c.get_absolute_url }}">
+        <td><div class="persona"><span class="avatar">{{ c.iniciales }}</span><div><a href="{{ c.get_absolute_url }}">{{ c.nombre_completo }}</a><div class="small text-secondary">{{ c.correo }}</div></div></div></td>
+        <td class="tabular">{{ c.telefono }}</td>
+        <td class="text-center tabular">{{ c.n_reservas }}</td>
+        <td class="tabular">{{ c.ultima|date:"d/m/Y"|default:"—" }}</td>
+        <td class="text-end tabular">{{ c.gastado|default:0|moneda }}</td>
+        <td class="text-secondary tabular">{{ c.fecha_registro|date:"d/m/Y" }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "includes/paginacion.html" %}
+  {% else %}
+  <div class="vacio"><i class="bi bi-person-x"></i>
+    <p class="mb-2">{% if q %}No hay clientes que coincidan con “{{ q }}”.{% else %}Aún no hay clientes registrados.{% endif %}</p>
+    <a class="btn btn-primary btn-sm" href="{% url 'clientes:crear' %}">Registrar cliente</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

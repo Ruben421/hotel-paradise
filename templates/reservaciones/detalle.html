@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}Reservación {{ r.folio }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="migas"><a href="{% url 'reservaciones:lista' %}">Reservaciones</a></div>
+    <h1 class="mb-1">Reservación {{ r.folio }}</h1>
+    <span class="estado {{ r.estado|estado_clase }}">{{ r.get_estado_display }}</span>
+  </div>
+  <div class="d-flex gap-2 flex-wrap no-print">
+    <button class="btn btn-light" type="button" onclick="window.print()"><i class="bi bi-printer me-1"></i>Imprimir comprobante</button>
+    {% if r.estado != "cancelada" %}<a class="btn btn-light" href="{% url 'reservaciones:editar' r.pk %}"><i class="bi bi-pencil me-1"></i>Modificar</a>{% endif %}
+    {% if r.puede_cancelarse %}
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalConfirmar"
+            data-url="{% url 'reservaciones:cancelar' r.pk %}" data-titulo="¿Cancelar la reservación {{ r.folio }}?"
+            data-mensaje="La habitación {{ r.habitacion.numero }} quedará libre del {{ r.fecha_entrada|date:'d/m/Y' }} al {{ r.fecha_salida|date:'d/m/Y' }}. La reservación se conserva en el historial como cancelada."
+            data-boton="Cancelar reservación"><i class="bi bi-x-circle me-1"></i>Cancelar</button>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="panel panel-body">
+      <div class="row g-4 align-items-center mb-2">
+        <div class="col-sm-5">
+          <div class="text-secondary small">Entrada</div>
+          <div class="cifra">{{ r.fecha_entrada|date:"D j M Y" }}</div>
+        </div>
+        <div class="col-sm-2 text-center text-secondary"><i class="bi bi-moon-stars fs-4 d-block"></i>{{ r.noches }} noche{{ r.noches|pluralize }}</div>
+        <div class="col-sm-5 text-sm-end">
+          <div class="text-secondary small">Salida</div>
+          <div class="cifra">{{ r.fecha_salida|date:"D j M Y" }}</div>
+        </div>
+      </div>
+      <hr>
+      <dl class="ficha">
+        <dt>Cliente</dt><dd><a href="{{ r.cliente.get_absolute_url }}">{{ r.cliente }}</a> <span class="text-secondary fw-normal">{{ r.cliente.correo }}</span></dd>
+        <dt>Teléfono</dt><dd>{{ r.cliente.telefono }}</dd>
+        <dt>Habitación</dt><dd><a href="{{ r.habitacion.get_absolute_url }}">{{ r.habitacion.numero }}</a>, {{ r.habitacion.get_tipo_display }}</dd>
+        <dt>Huéspedes</dt><dd>{{ r.huespedes }}</dd>
+        {% if r.notas %}<dt>Notas</dt><dd class="fw-normal">{{ r.notas|linebreaksbr }}</dd>{% endif %}
+        <dt>Registrada</dt><dd class="fw-normal">{{ r.creada|date:"d/m/Y H:i" }}{% if r.creada_por %} por {{ r.creada_por.get_full_name|default:r.creada_por.username }}{% endif %}</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="cotizacion">
+      <div class="small">Total de la estancia</div>
+      <div class="total">{{ r.total|moneda }}</div>
+      <div class="mt-3">
+        <div class="linea"><span>Tarifa por noche</span><span class="tabular">{{ r.habitacion.precio_noche|moneda }}</span></div>
+        <div class="linea"><span>Noches</span><span class="tabular">{{ r.noches }}</span></div>
+      </div>
+      {% if r.estado == "cancelada" %}<div class="aviso no">Reservación cancelada: no se cuenta en ingresos.</div>
+      {% elif r.estado == "finalizada" %}<div class="aviso ok">Estancia terminada y cobrada.</div>
+      {% elif r.estado == "pendiente" %}<div class="aviso">Pendiente de confirmar. Las fechas ya están apartadas.</div>
+      {% else %}<div class="aviso ok">Fechas apartadas para este huésped.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

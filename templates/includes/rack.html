@@ -1,0 +1,41 @@
+{# Mapa de ocupación: filas = habitaciones, columnas = días. Espera la variable "mapa". #}
+<div class="rack-wrap">
+  <table class="rack">
+    <colgroup><col class="col-hab">{% for d in mapa.dias %}<col>{% endfor %}</colgroup>
+    <thead>
+      <tr>
+        <th scope="col"><span class="visually-hidden">Habitación</span></th>
+        {% for d in mapa.dias %}
+        <th scope="col" class="{% if d == hoy %}hoy{% endif %} {% if d.weekday >= 5 %}finde{% endif %}">
+          {{ d|date:"D"|slice:":2" }}<span class="num">{{ d.day }}</span>
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in mapa.filas %}
+      <tr>
+        <th scope="row"><a href="{{ fila.habitacion.get_absolute_url }}">{{ fila.habitacion.numero }}<small>{{ fila.habitacion.get_tipo_display }}</small></a></th>
+        {% for s in fila.segmentos %}
+          {% if s.reservacion %}
+          <td colspan="{{ s.span }}">
+            <a class="estancia {{ s.tipo }} {% if s.corta_inicio %}continua{% endif %}" href="{{ s.reservacion.get_absolute_url }}"
+               title="{{ s.reservacion.folio }}: {{ s.reservacion.cliente }}, {{ s.reservacion.fecha_entrada|date:'d M' }} al {{ s.reservacion.fecha_salida|date:'d M' }}">
+              {{ s.reservacion.cliente.apellidos|truncatewords:1 }}
+            </a>
+          </td>
+          {% elif s.tipo == "fuera" %}
+          <td class="fuera" title="Fuera de servicio"></td>
+          {% else %}
+          <td class="libre"><a href="{% url 'reservaciones:crear' %}?habitacion={{ fila.habitacion.pk }}&entrada={{ s.dia|date:'Y-m-d' }}"
+                 aria-label="Reservar habitación {{ fila.habitacion.numero }} el {{ s.dia|date:'d/m' }}" title="Libre: reservar"></a></td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="rack-leyenda mt-2">
+  <span class="l-conf">Confirmada</span><span class="l-pend">Pendiente</span><span class="l-libre">Libre (clic para reservar)</span><span class="l-fuera">Fuera de servicio</span>
+</div>

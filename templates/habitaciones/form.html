@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Editar habitación {{ object.numero }}{% else %}Registrar habitación{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="migas"><a href="{% url 'habitaciones:lista' %}">Habitaciones</a>{% if object %} / <a href="{{ object.get_absolute_url }}">{{ object.numero }}</a>{% endif %}</div>
+    <h1 class="mb-0">{% if object %}Editar habitación {{ object.numero }}{% else %}Registrar habitación{% endif %}</h1>
+  </div>
+</div>
+
+<form class="row g-4" method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="col-lg-7">
+    <div class="panel panel-body">
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+      <div class="row">
+        <div class="col-sm-4">{% include "includes/campo.html" with f=form.numero %}</div>
+        <div class="col-sm-8">{% include "includes/campo.html" with f=form.tipo %}</div>
+        <div class="col-sm-6">{% include "includes/campo.html" with f=form.precio_noche %}</div>
+        <div class="col-sm-6">{% include "includes/campo.html" with f=form.capacidad %}</div>
+      </div>
+      {% include "includes/campo.html" with f=form.descripcion %}
+      {% include "includes/campo.html" with f=form.disponible %}
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="panel panel-body">
+      <label class="form-label" for="{{ form.imagen.id_for_label }}">Fotografía <span class="text-secondary fw-normal">(opcional)</span></label>
+      <img id="previa" class="foto-grande mb-3" src="{% if object.imagen %}{{ object.imagen.url }}{% endif %}" alt="" {% if not object.imagen %}hidden{% endif %}>
+      {% include "includes/campo.html" with f=form.imagen %}
+      <p class="form-text mb-0">JPG o PNG de máximo 5 MB.</p>
+    </div>
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn btn-primary px-4" type="submit">{% if object %}Guardar cambios{% else %}Registrar habitación{% endif %}</button>
+      <a class="btn btn-light" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'habitaciones:lista' %}{% endif %}">Cancelar</a>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("{{ form.imagen.id_for_label }}").addEventListener("change", (e) => {
+    const f = e.target.files[0], img = document.getElementById("previa");
+    if (f) { img.src = URL.createObjectURL(f); img.hidden = false; }
+  });
+</script>
+{% endblock %}

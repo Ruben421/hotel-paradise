@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}Reservaciones{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Reservaciones</h1>
+    <p>{{ paginator.count }} reservaci{{ paginator.count|pluralize:"ón,ones" }} con los filtros actuales.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'reservaciones:crear' %}"><i class="bi bi-plus-lg me-1"></i>Nueva reservación</a>
+</div>
+
+<div class="panel">
+  <form class="filtros" method="get" data-autoenvio>
+    <div class="buscar"><i class="bi bi-search"></i>
+      <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Cliente, correo, folio o habitación" aria-label="Buscar reservación">
+    </div>
+    <select class="form-select" name="estado" aria-label="Estado">
+      {% for v, l in filtro.fields.estado.choices %}<option value="{{ v }}" {% if request.GET.estado == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+    </select>
+    <select class="form-select" name="tipo" aria-label="Tipo de habitación">
+      {% for v, l in filtro.fields.tipo.choices %}<option value="{{ v }}" {% if request.GET.tipo == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+    </select>
+    <label class="d-flex align-items-center gap-2 small text-secondary">Del <input class="form-control form-control-sm" type="date" name="desde" value="{{ request.GET.desde }}"></label>
+    <label class="d-flex align-items-center gap-2 small text-secondary">al <input class="form-control form-control-sm" type="date" name="hasta" value="{{ request.GET.hasta }}"></label>
+    <button class="btn btn-light" type="submit">Buscar</button>
+    {% if request.GET %}<a class="btn btn-link" href="{% url 'reservaciones:lista' %}">Limpiar</a>{% endif %}
+  </form>
+
+  {% if reservaciones %}
+  <div class="table-responsive">
+    <table class="table tabla">
+      <thead><tr><th>Folio</th><th>Cliente</th><th>Habitación</th><th>Entrada</th><th>Salida</th><th class="text-center">Noches</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
+      <tbody>
+      {% for r in reservaciones %}
+      <tr data-href="{{ r.get_absolute_url }}">
+        <td class="folio">{{ r.folio }}</td>
+        <td><div class="persona"><span class="avatar">{{ r.cliente.iniciales }}</span><a href="{{ r.get_absolute_url }}">{{ r.cliente }}</a></div></td>
+        <td>{{ r.habitacion.numero }} <span class="text-secondary small">{{ r.habitacion.get_tipo_display }}</span></td>
+        <td class="tabular">{{ r.fecha_entrada|date:"d/m/Y" }}</td>
+        <td class="tabular">{{ r.fecha_salida|date:"d/m/Y" }}</td>
+        <td class="text-center tabular">{{ r.noches }}</td>
+        <td><span class="estado {{ r.estado|estado_clase }}">{{ r.get_estado_display }}</span></td>
+        <td class="text-end tabular fw-semibold">{{ r.total|moneda }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "includes/paginacion.html" %}
+  {% else %}
+  <div class="vacio"><i class="bi bi-journal-x"></i>
+    <p class="mb-2">No hay reservaciones con estos filtros.</p>
+    <a href="{% url 'reservaciones:lista' %}">Quitar filtros</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

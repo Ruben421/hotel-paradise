@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load paradise humanize %}
+{% block title %}Reportes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Reportes y estadísticas</h1>
+    <p>Reservaciones con entrada del {{ desde|date:"j M Y" }} al {{ hasta|date:"j M Y" }} ({{ dias }} días).</p>
+  </div>
+  <form class="d-flex flex-wrap gap-2 align-items-center no-print" method="get">
+    <input class="form-control" type="date" name="desde" value="{{ desde|date:'Y-m-d' }}" aria-label="Desde">
+    <input class="form-control" type="date" name="hasta" value="{{ hasta|date:'Y-m-d' }}" aria-label="Hasta">
+    <button class="btn btn-primary" type="submit">Actualizar</button>
+    <a class="btn btn-light" href="?{% qs formato='csv' %}"><i class="bi bi-filetype-csv me-1"></i>Exportar CSV</a>
+    <button class="btn btn-light" type="button" onclick="window.print()"><i class="bi bi-printer me-1"></i>Imprimir</button>
+  </form>
+</div>
+
+<section class="kpis mb-4">
+  <div class="kpi dinero"><div class="etiqueta">Ingresos</div><div class="valor">{{ ingresos|moneda }}</div><div class="nota">confirmadas y finalizadas</div></div>
+  <div class="kpi"><div class="etiqueta">Reservaciones</div><div class="valor">{{ n_reservas }}</div><div class="nota">{{ n_canceladas }} cancelada{{ n_canceladas|pluralize }}</div></div>
+  <div class="kpi"><div class="etiqueta">Noches vendidas</div><div class="valor">{{ noches|intcomma }}</div><div class="nota">tarifa promedio {{ tarifa_promedio|moneda }}</div></div>
+  <div class="kpi"><div class="etiqueta">Ocupación del periodo</div><div class="valor">{{ ocupacion }}%</div><div class="nota">sobre habitaciones en servicio</div></div>
+  <div class="kpi"><div class="etiqueta">Clientes nuevos</div><div class="valor">{{ nuevos_clientes }}</div><div class="nota">registrados en el periodo</div></div>
+</section>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-7">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Ingresos por mes</h2></div>
+      <div class="panel-body"><canvas id="graficaMes" height="130" role="img" aria-label="Ingresos por mes"></canvas></div>
+    </section>
+  </div>
+  <div class="col-xl-5">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Ingresos por tipo de habitación</h2></div>
+      <div class="panel-body">
+        {% for t in por_tipo %}
+        <div class="mb-3">
+          <div class="d-flex justify-content-between"><span class="fw-semibold">{{ t.tipo }}</span><span class="tabular fw-semibold">{{ t.total|moneda }}</span></div>
+          <div class="barra my-1"><span style="width: {% widthratio t.total ingresos 100 %}%"></span></div>
+          <div class="small text-secondary">{{ t.n }} reservaci{{ t.n|pluralize:"ón,ones" }}, {{ t.noches }} noches, {% widthratio t.total ingresos 100 %}% del ingreso</div>
+        </div>
+        {% empty %}<p class="text-secondary mb-0">Sin ingresos en el periodo.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Por estado</h2></div>
+      <div class="panel-body">
+        {% for e in por_estado %}
+        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <span class="estado {{ e.estado|estado_clase }}">{{ e.etiqueta }}</span><span class="tabular fw-semibold">{{ e.n }}</span>
+        </div>
+        {% empty %}<p class="text-secondary mb-0">Sin reservaciones en el periodo.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+  <div class="col-lg-4">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Mejores clientes</h2></div>
+      <div class="panel-body">
+        <ol class="lista-dia">
+          {% for c in top_clientes %}
+          <li><span class="avatar">{{ c.iniciales }}</span><a class="flex-grow-1" href="{{ c.get_absolute_url }}">{{ c }}</a><span class="text-end tabular small"><strong>{{ c.total|moneda }}</strong><br><span class="text-secondary">{{ c.n }} estancia{{ c.n|pluralize }}</span></span></li>
+          {% empty %}<li class="text-secondary">Sin datos.</li>{% endfor %}
+        </ol>
+      </div>
+    </section>
+  </div>
+  <div class="col-lg-4">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Habitaciones que más venden</h2></div>
+      <div class="panel-body">
+        <ol class="lista-dia">
+          {% for h in top_habitaciones %}
+          <li><span class="hab">{{ h.numero }}</span><span class="flex-grow-1">{{ h.get_tipo_display }}</span><span class="text-end tabular small"><strong>{{ h.total|moneda }}</strong><br><span class="text-secondary">{{ h.n }} reservaci{{ h.n|pluralize:"ón,ones" }}</span></span></li>
+          {% empty %}<li class="text-secondary">Sin datos.</li>{% endfor %}
+        </ol>
+      </div>
+    </section>
+  </div>
+</div>
+{{ grafica|json_script:"datos-grafica" }}
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const g = JSON.parse(document.getElementById("datos-grafica").textContent);
+  new Chart(document.getElementById("graficaMes"), {
+    type: "line",
+    data: { labels: g.etiquetas, datasets: [{ data: g.valores, borderColor: "#0b6e79", backgroundColor: "rgba(11,110,121,.12)",
+            fill: true, tension: .3, pointBackgroundColor: "#f2b544", pointBorderColor: "#0b6e79", pointRadius: 5 }] },
+    options: {
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => " $" + c.parsed.y.toLocaleString("es-MX", { minimumFractionDigits: 2 }) } } },
+      scales: { x: { grid: { display: false } },
+                y: { beginAtZero: true, grid: { color: "#e8eeee" }, border: { display: false },
+                     ticks: { callback: (v) => "$" + (v >= 1000 ? (v / 1000) + "k" : v) } } },
+    },
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Usuarios</h1>
+    <p>Los recepcionistas manejan clientes y reservaciones. Los administradores además gestionan habitaciones, reportes y usuarios.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'core:usuario_crear' %}"><i class="bi bi-person-plus me-1"></i>Crear usuario</a>
+</div>
+<div class="panel">
+  <div class="table-responsive">
+    <table class="table tabla">
+      <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Último acceso</th><th></th></tr></thead>
+      <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td><div class="persona"><span class="avatar">{{ u.first_name|default:u.username|slice:":1"|upper }}{{ u.last_name|slice:":1"|upper }}</span><div><strong>{{ u.get_full_name|default:u.username }}</strong><div class="small text-secondary">{{ u.username }}</div></div></div></td>
+        <td>{{ u.email|default:"—" }}</td>
+        <td>{{ u.rol }}{% if u.is_superuser %} <span class="text-secondary small">(superusuario)</span>{% endif %}</td>
+        <td>{% if u.is_active %}<span class="estado estado-confirmada">Activo</span>{% else %}<span class="estado estado-finalizada">Inactivo</span>{% endif %}</td>
+        <td class="text-secondary tabular">{{ u.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</td>
+        <td class="text-end"><a class="btn btn-light btn-sm" href="{% url 'core:usuario_editar' u.pk %}">Editar</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load paradise humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="mt-0 mb-1">{{ hoy|date:"l j \d\e F" }}</p>
+    <div class="saludo">Hoy están ocupadas <span class="ocupacion">{{ habitaciones_ocupadas }} de {{ en_servicio_n }}</span> habitaciones en servicio.</div>
+  </div>
+  <div class="d-flex gap-2 no-print">
+    <a class="btn btn-light" href="{% url 'reservaciones:disponibilidad' %}"><i class="bi bi-search me-1"></i>Consultar disponibilidad</a>
+    <a class="btn btn-primary" href="{% url 'reservaciones:crear' %}"><i class="bi bi-plus-lg me-1"></i>Nueva reservación</a>
+  </div>
+</div>
+
+<section class="kpis mb-4" aria-label="Indicadores">
+  <a class="kpi" href="{% url 'clientes:lista' %}">
+    <div class="etiqueta"><i class="bi bi-people"></i>Clientes</div>
+    <div class="valor">{{ total_clientes|intcomma }}</div>
+    <div class="nota">registrados</div>
+  </a>
+  <a class="kpi" href="{% url 'habitaciones:lista' %}">
+    <div class="etiqueta"><i class="bi bi-door-closed"></i>Habitaciones</div>
+    <div class="valor">{{ total_habitaciones }}</div>
+    <div class="nota">{% if fuera_servicio %}{{ fuera_servicio }} fuera de servicio{% else %}todas en servicio{% endif %}</div>
+  </a>
+  <a class="kpi" href="{% url 'reservaciones:lista' %}">
+    <div class="etiqueta"><i class="bi bi-journal-bookmark"></i>Reservaciones</div>
+    <div class="valor">{{ total_reservaciones|intcomma }}</div>
+    <div class="nota">{{ reservaciones_activas }} activas</div>
+  </a>
+  <a class="kpi" href="{% url 'habitaciones:lista' %}?estado=libre">
+    <div class="etiqueta"><i class="bi bi-check2-circle"></i>Disponibles hoy</div>
+    <div class="valor">{{ habitaciones_disponibles }}</div>
+    <div class="nota">ocupación {{ ocupacion_pct }}%</div>
+  </a>
+  <div class="kpi dinero">
+    <div class="etiqueta"><i class="bi bi-cash-stack"></i>Ingresos generados</div>
+    <div class="valor">{{ ingresos|moneda }}</div>
+    <div class="nota">{{ ingresos_mes|moneda }} este mes</div>
+  </div>
+</section>
+
+<section class="panel mb-4">
+  <div class="panel-head">
+    <div>
+      <h2 class="mb-0">Próximos 14 días</h2>
+      <p class="text-secondary small mb-0">Haz clic en un espacio libre para reservar esa habitación desde ese día.</p>
+    </div>
+    <a class="btn btn-light btn-sm no-print" href="{% url 'reservaciones:ocupacion' %}">Ver mapa completo</a>
+  </div>
+  <div class="panel-body">{% include "includes/rack.html" %}</div>
+</section>
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Ingresos de los últimos 6 meses</h2></div>
+      <div class="panel-body"><canvas id="graficaIngresos" height="120" aria-label="Gráfica de ingresos por mes" role="img"></canvas></div>
+    </section>
+  </div>
+  <div class="col-xl-5">
+    <section class="panel h-100">
+      <div class="panel-head"><h2 class="mb-0">Movimientos de hoy</h2></div>
+      <div class="panel-body">
+        <h3 class="h6 text-secondary mb-1">Llegadas ({{ llegadas|length }})</h3>
+        <ul class="lista-dia mb-3">
+          {% for r in llegadas %}
+          <li><span class="hab">{{ r.habitacion.numero }}</span><a class="flex-grow-1" href="{{ r.get_absolute_url }}">{{ r.cliente }}</a><span class="text-secondary small">{{ r.noches }} noche{{ r.noches|pluralize }}</span></li>
+          {% empty %}<li class="text-secondary">Sin llegadas programadas.</li>{% endfor %}
+        </ul>
+        <h3 class="h6 text-secondary mb-1">Salidas ({{ salidas|length }})</h3>
+        <ul class="lista-dia mb-3">
+          {% for r in salidas %}
+          <li><span class="hab">{{ r.habitacion.numero }}</span><a class="flex-grow-1" href="{{ r.get_absolute_url }}">{{ r.cliente }}</a><span class="small fw-semibold">{{ r.total|moneda }}</span></li>
+          {% empty %}<li class="text-secondary">Sin salidas programadas.</li>{% endfor %}
+        </ul>
+        <h3 class="h6 text-secondary mb-1">Esta semana</h3>
+        <ul class="lista-dia">
+          {% for r in proximas %}
+          <li><span class="hab">{{ r.habitacion.numero }}</span><a class="flex-grow-1" href="{{ r.get_absolute_url }}">{{ r.cliente }}</a><span class="text-secondary small">{{ r.fecha_entrada|date:"D j" }}</span></li>
+          {% empty %}<li class="text-secondary">No hay llegadas en los próximos 7 días.</li>{% endfor %}
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+{{ grafica|json_script:"datos-grafica" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const g = JSON.parse(document.getElementById("datos-grafica").textContent);
+  new Chart(document.getElementById("graficaIngresos"), {
+    type: "bar",
+    data: { labels: g.etiquetas, datasets: [{ data: g.valores, backgroundColor: "#0b6e79", borderRadius: 6, maxBarThickness: 46 }] },
+    options: {
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => " $" + c.parsed.y.toLocaleString("es-MX", { minimumFractionDigits: 2 }) } } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: "#e8eeee" }, border: { display: false },
+             ticks: { callback: (v) => "$" + (v >= 1000 ? (v / 1000) + "k" : v) } },
+      },
+    },
+  });
+</script>
+{% endblock %}

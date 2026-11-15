@@ -1,0 +1,243 @@
+/* Hotel Paradise — hoja de estilos
+   Paleta "laguna": tinta de arrecife, laguna, espuma, sol y coral. */
+:root {
+  --reef: #0d2e36;        /* tinta / barra lateral */
+  --reef-2: #164450;
+  --lagoon: #0b6e79;      /* acción principal, confirmada */
+  --lagoon-dark: #08545c;
+  --foam: #dcefec;        /* tintes suaves */
+  --mist: #f3f7f6;        /* fondo de página */
+  --sun: #f2b544;         /* dinero, pendiente */
+  --sun-soft: #fdf1d8;
+  --coral: #d9604c;       /* cancelada, peligro */
+  --coral-soft: #fbe5e0;
+  --slate: #6b7f86;       /* texto secundario, finalizada */
+  --line: #dde6e6;
+  --ink: #15262c;
+
+  --bs-primary: var(--lagoon);
+  --bs-primary-rgb: 11, 110, 121;
+  --bs-body-font-family: "Figtree", system-ui, sans-serif;
+  --bs-body-color: var(--ink);
+  --bs-body-bg: var(--mist);
+  --bs-border-color: var(--line);
+  --bs-link-color: var(--lagoon);
+  --bs-link-hover-color: var(--lagoon-dark);
+  --bs-link-color-rgb: 11, 110, 121;
+  --bs-focus-ring-color: rgba(11, 110, 121, .3);
+  --sidebar-w: 248px;
+}
+
+h1, h2, h3, h4, .display-font { font-family: "Bricolage Grotesque", "Figtree", sans-serif; letter-spacing: -.015em; }
+h1 { font-size: 1.85rem; font-weight: 700; }
+h2 { font-size: 1.25rem; font-weight: 650; }
+h3 { font-size: 1.05rem; font-weight: 650; }
+.text-secondary { color: var(--slate) !important; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------- Botones ---------- */
+.btn { font-weight: 600; border-radius: .6rem; }
+.btn-primary { --bs-btn-bg: var(--lagoon); --bs-btn-border-color: var(--lagoon); --bs-btn-hover-bg: var(--lagoon-dark);
+  --bs-btn-hover-border-color: var(--lagoon-dark); --bs-btn-active-bg: var(--lagoon-dark); --bs-btn-disabled-bg: var(--lagoon); }
+.btn-outline-primary { --bs-btn-color: var(--lagoon); --bs-btn-border-color: var(--lagoon); --bs-btn-hover-bg: var(--lagoon);
+  --bs-btn-hover-border-color: var(--lagoon); --bs-btn-active-bg: var(--lagoon-dark); }
+.btn-light { --bs-btn-bg: #fff; --bs-btn-border-color: var(--line); --bs-btn-hover-bg: var(--foam); --bs-btn-hover-border-color: var(--foam); }
+.btn-danger { --bs-btn-bg: var(--coral); --bs-btn-border-color: var(--coral); --bs-btn-hover-bg: #bf4d3a; --bs-btn-hover-border-color: #bf4d3a; }
+.btn-outline-danger { --bs-btn-color: var(--coral); --bs-btn-border-color: var(--coral); --bs-btn-hover-bg: var(--coral); --bs-btn-hover-border-color: var(--coral); }
+:focus-visible { outline: 3px solid rgba(11, 110, 121, .45); outline-offset: 2px; }
+
+/* ---------- Estructura ---------- */
+.app-sidebar { width: var(--sidebar-w); background: var(--reef) !important; color: #cfe3e3; }
+.app-sidebar .offcanvas-body { background: var(--reef) !important; }
+@media (min-width: 992px) {
+  .app-sidebar { position: fixed; inset: 0 auto 0 0; }
+  .app-main { margin-left: var(--sidebar-w); }
+}
+.app-sidebar .offcanvas-body { display: flex; flex-direction: column; padding: 1.5rem 1rem; height: 100%; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: .7rem; color: #fff; text-decoration: none; padding: 0 .5rem 1.5rem; }
+.brand-mark { width: 38px; height: 38px; flex: none; }
+.brand-name { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.2rem; font-weight: 700; line-height: 1; }
+.brand-sub { font-size: .78rem; color: #8fb3b5; }
+
+.nav-grupo { font-size: .78rem; color: #7ea3a6; padding: 1.1rem .75rem .35rem; }
+.app-nav .nav-link { color: #cfe3e3; border-radius: .55rem; padding: .55rem .75rem; display: flex; gap: .7rem; align-items: center; font-weight: 500; }
+.app-nav .nav-link i { font-size: 1.05rem; opacity: .85; }
+.app-nav .nav-link:hover { background: var(--reef-2); color: #fff; }
+.app-nav .nav-link.active { background: var(--lagoon); color: #fff; }
+.app-nav .nav-link.active i { opacity: 1; }
+
+.sidebar-user { margin-top: auto; border-top: 1px solid rgba(255,255,255,.08); padding: 1rem .5rem 0; display: flex; align-items: center; gap: .65rem; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+  background: var(--foam); color: var(--lagoon-dark); flex: none; }
+.sidebar-user .avatar { background: var(--sun); color: var(--reef); }
+.sidebar-user .nombre { color: #fff; font-weight: 600; font-size: .92rem; line-height: 1.2; }
+.sidebar-user .rol { font-size: .78rem; color: #8fb3b5; }
+.btn-salir { color: #8fb3b5; background: none; border: 0; padding: .35rem; border-radius: .4rem; }
+.btn-salir:hover { color: #fff; background: var(--reef-2); }
+
+.topbar-movil { background: var(--reef); color: #fff; }
+.app-content { padding: 2rem clamp(1rem, 3vw, 2.5rem) 3rem; max-width: 1400px; }
+
+.page-head { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
+.page-head p { margin: .25rem 0 0; color: var(--slate); }
+.migas { font-size: .88rem; margin-bottom: .35rem; }
+.migas a { text-decoration: none; }
+
+.app-footer { color: var(--slate); font-size: .82rem; padding: 1.5rem clamp(1rem, 3vw, 2.5rem); border-top: 1px solid var(--line); }
+
+/* ---------- Superficies ---------- */
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 1rem; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.1rem 1.25rem .4rem; }
+.panel-body { padding: 1.25rem; }
+.panel-head + .panel-body { padding-top: .75rem; }
+
+/* Fila de indicadores del dashboard: silenciosa a propósito, el protagonista es el mapa. */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); background: #fff; border: 1px solid var(--line); border-radius: 1rem; overflow: hidden; }
+.kpi { padding: 1.1rem 1.25rem; border-right: 1px solid var(--line); text-decoration: none; color: inherit; }
+.kpi:last-child { border-right: 0; }
+a.kpi:hover { background: var(--mist); }
+.kpi .etiqueta { color: var(--slate); font-size: .86rem; display: flex; gap: .4rem; align-items: center; }
+.kpi .valor { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.75rem; font-weight: 700; line-height: 1.15; margin-top: .2rem; font-variant-numeric: tabular-nums; }
+.kpi .nota { font-size: .8rem; color: var(--slate); }
+.kpi.dinero .valor { color: var(--lagoon-dark); }
+@media (max-width: 767px) { .kpi { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+.saludo { font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; line-height: 1.15; max-width: 30ch; }
+.saludo .ocupacion { color: var(--lagoon); }
+
+/* ---------- Mapa de ocupación (el "rack" del hotel) ---------- */
+.rack-wrap { overflow-x: auto; }
+.rack { border-collapse: separate; border-spacing: 0 6px; width: 100%; min-width: 760px; table-layout: fixed; }
+.rack th, .rack td { padding: 0; }
+.rack thead th { font-weight: 500; font-size: .76rem; color: var(--slate); text-align: center; padding-bottom: .25rem; }
+.rack thead th .num { display: block; font-size: .95rem; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rack thead th.hoy .num { color: #fff; background: var(--lagoon); border-radius: .4rem; width: 1.9rem; margin: 0 auto; }
+.rack thead th.finde { color: var(--lagoon); }
+.rack .col-hab { width: 118px; }
+.rack tbody th { text-align: left; font-weight: 600; font-size: .9rem; padding-right: .75rem; white-space: nowrap; }
+.rack tbody th a { color: var(--ink); text-decoration: none; }
+.rack tbody th small { display: block; color: var(--slate); font-weight: 400; font-size: .76rem; }
+.rack td { height: 40px; }
+.rack td.libre { background: repeating-linear-gradient(90deg, transparent 0 calc(100% - 1px), var(--line) calc(100% - 1px) 100%); }
+.rack td.libre a { display: block; height: 100%; border-radius: .5rem; }
+.rack td.libre a:hover { background: var(--foam); }
+.rack td.fuera { background: repeating-linear-gradient(135deg, #eef2f2 0 6px, #e3e9e9 6px 12px); }
+.estancia { display: flex; align-items: center; gap: .4rem; height: 34px; margin: 3px 2px; padding: 0 .6rem; border-radius: .55rem;
+  font-size: .8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none;
+  background: var(--lagoon); color: #fff; }
+.estancia:hover { filter: brightness(1.08); color: #fff; }
+.estancia.pendiente { background: var(--sun); color: var(--reef); }
+.estancia.pendiente:hover { color: var(--reef); }
+.estancia.continua { border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: 0; }
+.rack-leyenda { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .82rem; color: var(--slate); }
+.rack-leyenda span::before { content: ""; display: inline-block; width: 14px; height: 10px; border-radius: 3px; margin-right: .35rem; vertical-align: 0; }
+.rack-leyenda .l-conf::before { background: var(--lagoon); }
+.rack-leyenda .l-pend::before { background: var(--sun); }
+.rack-leyenda .l-fuera::before { background: repeating-linear-gradient(135deg, #e3e9e9 0 3px, #cfd8d8 3px 6px); }
+.rack-leyenda .l-libre::before { background: #fff; border: 1px solid var(--line); }
+
+/* ---------- Estados ---------- */
+.estado { display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; font-weight: 600; padding: .2rem .6rem; border-radius: 999px; white-space: nowrap; }
+.estado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.estado-confirmada { background: var(--foam); color: var(--lagoon-dark); }
+.estado-pendiente { background: var(--sun-soft); color: #8a5d00; }
+.estado-finalizada { background: #eceff0; color: #4f6168; }
+.estado-cancelada { background: var(--coral-soft); color: #a83e2c; }
+.estado-libre { background: var(--foam); color: var(--lagoon-dark); }
+.estado-ocupada { background: var(--sun-soft); color: #8a5d00; }
+.estado-fuera { background: #eceff0; color: #4f6168; }
+
+/* ---------- Tablas ---------- */
+.tabla { --bs-table-bg: transparent; margin: 0; }
+.tabla thead th { font-weight: 600; font-size: .82rem; color: var(--slate); border-bottom: 1px solid var(--line); padding: .75rem 1rem; white-space: nowrap; }
+.tabla tbody td { padding: .8rem 1rem; vertical-align: middle; border-color: var(--line); }
+.tabla tbody tr:last-child td { border-bottom: 0; }
+.tabla tbody tr.fila-link { cursor: pointer; }
+.tabla tbody tr.fila-link:hover td { background: var(--mist); }
+.tabla .persona { display: flex; align-items: center; gap: .7rem; }
+.tabla .persona a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.folio { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--slate); }
+
+/* ---------- Filtros ---------- */
+.filtros { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid var(--line); }
+.filtros .buscar { position: relative; flex: 1 1 240px; }
+.filtros .buscar i { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--slate); }
+.filtros .buscar input { padding-left: 2.2rem; }
+.filtros .form-select, .filtros .form-control { width: auto; }
+.filtros .buscar .form-control { width: 100%; }
+.form-control, .form-select { border-radius: .6rem; border-color: #cfdcdc; background-color: #fff; }
+.page-head form .form-control { width: auto; }
+.form-control:focus, .form-select:focus { border-color: var(--lagoon); box-shadow: 0 0 0 .2rem rgba(11,110,121,.15); }
+.form-label { font-weight: 600; font-size: .9rem; margin-bottom: .3rem; }
+.form-text { color: var(--slate); }
+.form-check-input:checked { background-color: var(--lagoon); border-color: var(--lagoon); }
+
+/* ---------- Tarjetas de habitación ---------- */
+.hab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+.hab-card { background: #fff; border: 1px solid var(--line); border-radius: 1rem; overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+.hab-card:hover { border-color: var(--lagoon); color: inherit; }
+.hab-foto { aspect-ratio: 16 / 10; background: var(--foam) center / cover no-repeat; position: relative; }
+.hab-foto .estado { position: absolute; top: .7rem; left: .7rem; box-shadow: 0 1px 2px rgba(13,46,54,.15); }
+.hab-foto .sin-foto { position: absolute; inset: 0; display: grid; place-items: center; color: var(--lagoon); font-size: 2rem; }
+.hab-info { padding: .9rem 1rem 1rem; display: flex; justify-content: space-between; align-items: flex-end; gap: .5rem; }
+.hab-num { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.hab-tipo { color: var(--slate); font-size: .88rem; margin-top: .25rem; }
+.hab-precio { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hab-precio small { display: block; font-weight: 400; color: var(--slate); font-size: .78rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: .3rem .8rem; font-size: .85rem; color: var(--ink); text-decoration: none; }
+.chip:hover { border-color: var(--lagoon); color: var(--lagoon); }
+.chip.activo { background: var(--reef); border-color: var(--reef); color: #fff; }
+.chip .n { color: var(--slate); margin-left: .25rem; }
+.chip.activo .n { color: #9fc4c6; }
+
+/* ---------- Detalle ---------- */
+.ficha { display: grid; grid-template-columns: max-content 1fr; gap: .55rem 1.5rem; margin: 0; }
+.ficha dt { font-weight: 500; color: var(--slate); }
+.ficha dd { margin: 0; font-weight: 600; }
+.foto-grande { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 1rem; background: var(--foam); }
+.cifra { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- Formulario de reservación ---------- */
+.cotizacion { border-radius: 1rem; background: var(--reef); color: #d8eaea; padding: 1.4rem; position: sticky; top: 1.5rem; }
+.cotizacion .total { font-family: "Bricolage Grotesque", sans-serif; font-size: 2.3rem; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cotizacion .linea { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid rgba(255,255,255,.08); font-size: .92rem; }
+.cotizacion .aviso { margin-top: 1rem; padding: .65rem .8rem; border-radius: .6rem; font-size: .88rem; font-weight: 600; background: rgba(255,255,255,.06); }
+.cotizacion .aviso.ok { background: rgba(126, 214, 196, .16); color: #9fe6d6; }
+.cotizacion .aviso.no { background: rgba(217, 96, 76, .2); color: #ffb4a6; }
+
+/* ---------- Login ---------- */
+.login-page { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; background: #fff; }
+.login-arte { background: var(--reef); color: #fff; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.login-arte h1 { font-size: clamp(2.2rem, 4vw, 3.4rem); line-height: 1.02; max-width: 12ch; position: relative; z-index: 1; }
+.login-arte p { color: #9fc4c6; max-width: 38ch; position: relative; z-index: 1; }
+.login-sol { position: absolute; right: 14%; bottom: 38%; width: 92px; height: 92px; border-radius: 50%; background: var(--sun); }
+.login-arte svg.olas { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 55%; }
+.login-form { display: grid; place-items: center; padding: 2rem; }
+.login-form form { width: 100%; max-width: 360px; }
+.login-pie { font-size: .8rem; color: #8fb3b5; position: relative; z-index: 1; }
+@media (max-width: 860px) { .login-page { grid-template-columns: 1fr; } .login-arte { min-height: 260px; padding: 2rem; } }
+
+/* ---------- Varios ---------- */
+.vacio { text-align: center; padding: 3rem 1rem; color: var(--slate); }
+.vacio i { font-size: 2rem; color: var(--lagoon); display: block; margin-bottom: .5rem; }
+.barra { height: 8px; border-radius: 99px; background: var(--foam); overflow: hidden; }
+.barra > span { display: block; height: 100%; background: var(--lagoon); border-radius: 99px; }
+.lista-dia { list-style: none; margin: 0; padding: 0; }
+.lista-dia li { display: flex; align-items: center; gap: .75rem; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+.lista-dia li:last-child { border-bottom: 0; }
+.lista-dia a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.lista-dia a:hover { color: var(--lagoon); }
+.lista-dia .hab { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; width: 2.6rem; color: var(--lagoon); }
+.toast-container .toast { border: 0; border-radius: .8rem; box-shadow: 0 8px 24px rgba(13,46,54,.18); }
+.pagination { --bs-pagination-color: var(--lagoon); --bs-pagination-active-bg: var(--lagoon); --bs-pagination-active-border-color: var(--lagoon); --bs-pagination-border-radius: .6rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+@media print {
+  .app-sidebar, .topbar-movil, .no-print, .app-footer { display: none !important; }
+  .app-main { margin: 0 !important; }
+  .panel { border-color: #ccc; break-inside: avoid; }
+  body { background: #fff; }
+}

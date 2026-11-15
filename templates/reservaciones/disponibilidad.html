@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}Disponibilidad{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mb-0">Consultar disponibilidad</h1>
+    <p>Indica fechas y número de huéspedes para ver qué habitaciones puedes vender.</p>
+  </div>
+</div>
+
+<form class="panel panel-body mb-4" method="get" novalidate>
+  <div class="row g-3 align-items-end">
+    <div class="col-sm-6 col-lg-3">{% include "includes/campo.html" with f=form.entrada %}</div>
+    <div class="col-sm-6 col-lg-3">{% include "includes/campo.html" with f=form.salida %}</div>
+    <div class="col-sm-4 col-lg-2">{% include "includes/campo.html" with f=form.huespedes %}</div>
+    <div class="col-sm-4 col-lg-2">{% include "includes/campo.html" with f=form.tipo %}</div>
+    <div class="col-sm-4 col-lg-2"><button class="btn btn-primary w-100 mb-3" type="submit"><i class="bi bi-search me-1"></i>Buscar</button></div>
+  </div>
+</form>
+
+{% if buscado %}
+  <h2 class="mb-3">
+    {% if libres %}{{ libres|length }} habitaci{{ libres|length|pluralize:"ón,ones" }} libre{{ libres|length|pluralize }}{% else %}Sin habitaciones libres{% endif %}
+    <span class="text-secondary fw-normal fs-6">del {{ consulta.entrada|date:"j M" }} al {{ consulta.salida|date:"j M Y" }}, {{ noches }} noche{{ noches|pluralize }}</span>
+  </h2>
+  {% if libres %}
+  <div class="hab-grid">
+    {% for h in libres %}
+    <div class="hab-card">
+      <div class="hab-foto" {% if h.imagen %}style="background-image:url('{{ h.imagen.url }}')"{% endif %}>
+        {% if not h.imagen %}<span class="sin-foto"><i class="bi bi-image"></i></span>{% endif %}
+      </div>
+      <div class="hab-info">
+        <div>
+          <div class="hab-num">{{ h.numero }}</div>
+          <div class="hab-tipo">{{ h.get_tipo_display }}, hasta {{ h.capacidad }} pers.</div>
+        </div>
+        <div class="hab-precio">{{ h.total_estancia|moneda }}<small>{{ h.precio_noche|moneda }} por noche</small></div>
+      </div>
+      <div class="px-3 pb-3 mt-auto">
+        <a class="btn btn-primary w-100" href="{% url 'reservaciones:crear' %}?habitacion={{ h.pk }}&entrada={{ consulta.entrada|date:'Y-m-d' }}&salida={{ consulta.salida|date:'Y-m-d' }}&huespedes={{ consulta.huespedes }}">Reservar la {{ h.numero }}</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="panel vacio"><i class="bi bi-calendar-x"></i>
+    <p class="mb-1">Todas las habitaciones que cumplen esos requisitos están ocupadas o fuera de servicio.</p>
+    <p class="mb-0">Prueba con otras fechas, menos huéspedes o cualquier tipo de habitación, o revisa el <a href="{% url 'reservaciones:ocupacion' %}?inicio={{ consulta.entrada|date:'Y-m-d' }}">mapa de ocupación</a>.</p>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

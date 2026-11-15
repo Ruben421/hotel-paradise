@@ -1,0 +1,15 @@
+{% load paradise %}{% if f|es_checkbox %}
+<div class="form-check form-switch mb-3">
+  {{ f|campo }}
+  <label class="form-check-label fw-semibold" for="{{ f.id_for_label }}">{{ f.label }}</label>
+  {% if f.help_text %}<div class="form-text">{{ f.help_text }}</div>{% endif %}
+  {% for e in f.errors %}<div class="invalid-feedback d-block" id="{{ f.auto_id }}_error">{{ e }}</div>{% endfor %}
+</div>
+{% else %}
+<div class="mb-3">
+  <label class="form-label" for="{{ f.id_for_label }}">{{ f.label }}{% if not f.field.required %} <span class="text-secondary fw-normal">(opcional)</span>{% endif %}</label>
+  {{ f|campo }}
+  {% if f.help_text %}<div class="form-text">{{ f.help_text }}</div>{% endif %}
+  {% for e in f.errors %}<div class="invalid-feedback d-block" id="{{ f.auto_id }}_error">{{ e }}</div>{% endfor %}
+</div>
+{% endif %}

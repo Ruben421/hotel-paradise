@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load paradise %}
+{% block title %}{{ cliente }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div class="d-flex align-items-center gap-3">
+    <span class="avatar" style="width:56px;height:56px;font-size:1.2rem">{{ cliente.iniciales }}</span>
+    <div>
+      <div class="migas"><a href="{% url 'clientes:lista' %}">Clientes</a></div>
+      <h1 class="mb-0">{{ cliente.nombre_completo }}</h1>
+    </div>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-primary" href="{% url 'reservaciones:crear' %}?cliente={{ cliente.pk }}"><i class="bi bi-plus-lg me-1"></i>Nueva reservación</a>
+    <a class="btn btn-light" href="{% url 'clientes:editar' cliente.pk %}"><i class="bi bi-pencil me-1"></i>Editar</a>
+    {% if es_admin %}
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modalConfirmar"
+            data-url="{% url 'clientes:eliminar' cliente.pk %}" data-titulo="¿Eliminar a {{ cliente.nombre_completo }}?"
+            data-mensaje="Se borrará su historial de reservaciones terminadas. Si tiene reservaciones activas, el sistema no lo permitirá."
+            data-boton="Eliminar cliente"><i class="bi bi-trash me-1"></i>Eliminar</button>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="panel panel-body mb-4">
+      <dl class="ficha">
+        <dt>Correo</dt><dd><a href="mailto:{{ cliente.correo }}">{{ cliente.correo }}</a></dd>
+        <dt>Teléfono</dt><dd><a href="tel:{{ cliente.telefono }}">{{ cliente.telefono }}</a></dd>
+        <dt>Cliente desde</dt><dd>{{ cliente.fecha_registro|date:"j \d\e F \d\e Y" }}</dd>
+      </dl>
+    </div>
+    <div class="panel panel-body d-flex justify-content-between">
+      <div><div class="text-secondary small">Consumo total</div><div class="cifra">{{ gastado|moneda }}</div></div>
+      <div class="text-end"><div class="text-secondary small">Noches</div><div class="cifra">{{ noches }}</div></div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <section class="panel">
+      <div class="panel-head"><h2 class="mb-0">Reservaciones ({{ reservaciones|length }})</h2></div>
+      {% if reservaciones %}
+      <div class="table-responsive">
+        <table class="table tabla">
+          <thead><tr><th>Folio</th><th>Habitación</th><th>Fechas</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
+          <tbody>
+          {% for r in reservaciones %}
+          <tr data-href="{{ r.get_absolute_url }}">
+            <td class="folio">{{ r.folio }}</td>
+            <td>{{ r.habitacion.numero }} <span class="text-secondary">{{ r.habitacion.get_tipo_display }}</span></td>
+            <td class="tabular">{{ r.fecha_entrada|date:"d/m/y" }} al {{ r.fecha_salida|date:"d/m/y" }}</td>
+            <td><span class="estado {{ r.estado|estado_clase }}">{{ r.get_estado_display }}</span></td>
+            <td class="text-end tabular">{{ r.total|moneda }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="vacio"><i class="bi bi-journal"></i><p class="mb-2">Este cliente aún no tiene reservaciones.</p>
+        <a class="btn btn-primary btn-sm" href="{% url 'reservaciones:crear' %}?cliente={{ cliente.pk }}">Crear su primera reservación</a></div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
